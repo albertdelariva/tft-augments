@@ -33,6 +33,7 @@ function filtered(){let arr=DATA.filter(r=>{
 }
 function slugAugment(name){return name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\+\+/g," plusplus ").replace(/\+/g," plus ").replace(/&/g," and ").replace(/['’]/g,"").replace(/[^a-zA-Z0-9]+/g,"").toLowerCase();}
 function augmentIconUrl(name){return `https://tftcodex.com/img/augments/da-${slugAugment(name)}.png`;}
+function handleAugmentIconError(img){const n=img.alt.replace(/ icon$/,'');const fallback=img.nextElementSibling;img.style.display='none';if(fallback){fallback.style.display='flex';fallback.textContent=n.charAt(0).toUpperCase()||'?';fallback.title=n+' (image unavailable)';}}
 
 function updateGuideSourceStatus(){
  const el=$('#guideSourceStatus'); if(!el)return;
@@ -54,7 +55,7 @@ function render(){
  body.innerHTML=arr.map(r=>{
    const stages=stageList(r.appears); const sc=stages.length?stages.map(s=>`<span class="stage">${esc(s)}</span>`).join(''):'<span class="stage unknown">Not listed</span>';
    const tags=r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-   return `<tr><td class="name"><div class="namewrap"><div class="iconbox"><img class="augment-icon" src="${augmentIconUrl(r.name)}" alt="${esc(r.name)} icon" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="augment-fallback">?</div></div><div><div class="augment-title">${esc(r.name)}</div>${r.availability==='Disabled'?'<span class="disabled-pill">Disabled</span>':''}<div class="tags">${tags}</div></div></div></td><td class="desc">${esc(r.description)}${r.patchNote?'<div class="patch-note"><b>'+esc(r.patch)+':</b> '+esc(r.patchNote)+'</div>':''}</td><td><span class="badge ${r.tier.toLowerCase()}">${esc(r.tier)}</span></td><td><span class="rank rank-${r.rank.toLowerCase()}">${esc(r.rank==='Unranked'?'--':r.rank)}</span></td><td>${sc}</td><td class="guide">${esc(r.guide)}</td></tr>`;
+   return `<tr><td class="name"><div class="namewrap"><div class="iconbox"><img class="augment-icon" src="${augmentIconUrl(r.name)}" alt="${esc(r.name)} icon" loading="lazy" referrerpolicy="no-referrer" onerror="handleAugmentIconError(this)"><div class="augment-fallback">?</div></div><div><div class="augment-title">${esc(r.name)}</div>${r.availability==='Disabled'?'<span class="disabled-pill">Disabled</span>':''}<div class="tags">${tags}</div></div></div></td><td class="desc">${esc(r.description)}${r.patchNote?'<div class="patch-note"><b>'+esc(r.patch)+':</b> '+esc(r.patchNote)+'</div>':''}</td><td><span class="badge ${r.tier.toLowerCase()}">${esc(r.tier)}</span></td><td><span class="rank rank-${r.rank.toLowerCase()}">${esc(r.rank==='Unranked'?'--':r.rank)}</span></td><td>${sc}</td><td class="guide">${esc(r.guide)}</td></tr>`;
  }).join('');
  document.querySelectorAll('.sortmark').forEach(x=>x.classList.remove('active'));
  const m=document.querySelector(`[data-mark="${sortKey}"]`);if(m){m.classList.add('active');m.textContent=sortDir===1?'▲':'▼';}
